@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+
+{% block title %}Dong's{% endblock %}
+{% block navbar_title %}Dong's{% endblock %}
+
+{% block content %}
+<h2 class="text-center">Dong's</h2>
+
+<div class="row">
+    <div class="col-md-6">
+        <h4 class="text-center">Live Stream</h4>
+        <div class="d-flex justify-content-center">
+            <img id="streamImage" src="{{ stream_url }}" alt="YOLO Stream" style="width: 100%; height: auto;">
+        </div>
+        <button id="refreshStream" class="btn btn-primary mt-2">스트림 새로고침</button>
+    </div>
+    <div class="input-group" id="framesize-group">
+        <label for="framesize">해상도 선택</label>
+        <select id="framesize" class="default-action">
+            <!-- 2MP -->
+            <option value="15">UXGA(1600x1200)</option>
+            <option value="14">SXGA(1280x1024)</option>
+            <option value="13">HD(1280x720)</option>
+            <option value="12">XGA(1024x768)</option>
+            <option value="11">SVGA(800x600)</option>
+            <option value="10">VGA(640x480)</option>
+            <option value="9">HVGA(480x320)</option>
+            <option value="8">CIF(400x296)</option>
+            <!--option value="7">320x320</option--> <!-- ov2640 미지원 해상도 -->
+            <option value="6">QVGA(320x240)</option>
+            <option value="5">240x240</option>
+            <option value="4">HQVGA(240x176)</option>
+            <option value="3">QCIF(176x144)</option>
+            <option value="2">128x128</option>
+            <option value="1">QQVGA(160x120)</option>
+            <option value="0">96x96</option>
+        </select>
+    </div>
+
+    <div class="input-group" id="quality-group">
+        <label for="quality">화질 설정</label>
+        <div class="range-min">4</div>
+        <input type="range" id="quality" min="4" max="63" value="10" class="default-action">
+        <div class="range-max">63</div>
+    </div>
+
+    <div class="input-group" id="brightness-group">
+        <label for="brightness">밝기 조절</label>
+        <div class="range-min">-2</div>
+        <input type="range" id="brightness" min="-2" max="2" value="0" class="default-action">
+        <div class="range-max">2</div>
+    </div>
+
+    <div class="input-group" id="contrast-group">
+        <label for="contrast">명암 조절</label>
+        <div class="range-min">-2</div>
+        <input type="range" id="contrast" min="-2" max="2" value="0" class="default-action">
+        <div class="range-max">2</div>
+    </div>
+
+    <div class="input-group" id="saturation-group">
+        <label for="saturation">채도 조절</label>
+        <div class="range-min">-2</div>
+        <input type="range" id="saturation" min="-2" max="2" value="0" class="default-action">
+        <div class="range-max">2</div>
+    </div>
+
+    <div class="input-group" id="special_effect-group">
+        <label for="special_effect">특수 효과</label>
+        <select id="special_effect" class="default-action">
+            <option value="0" selected="selected">효과 없음</option>
+            <option value="1">네거티브(반전)</option>
+            <option value="2">흑백</option>
+            <option value="3">레드 틴트</option>
+            <option value="4">그린 틴트</option>
+            <option value="5">블루 틴트</option>
+            <option value="6">세피아(갈색톤)</option>
+        </select>
+    </div>
+
+    <div class="input-group" id="wb_mode-group">
+        <label for="wb_mode">화이트밸런스 모드</label>
+        <select id="wb_mode" class="default-action">
+            <option value="0" selected="selected">자동</option>
+            <option value="1">맑은 날</option>
+            <option value="2">흐린 날</option>
+            <option value="3">사무실 조명</option>
+            <option value="4">가정 조명</option>
+        </select>
+    </div>
+
+    <div class="input-group" id="led-group">
+        <label for="led_intensity">LED 밝기 조절</label>
+        <div class="range-min">0</div>
+        <input type="range" id="led_intensity" min="0" max="255" value="0" class="default-action">
+        <div class="range-max">255</div>
+    </div>
+
+
+
+</div>
+
+<script>
+function changeOption(option, value) {
+    fetch(`/set_camera_option/?option=${option}&value=${value}`)
+        .then(response => response.json())
+        .then(data => {
+            alert(data.message);
+            refreshStream();
+        })
+        .catch(error => alert("오류 발생: " + error));
+}
+
+function refreshStream() {
+    const streamImg = document.getElementById('streamImage');
+    streamImg.src = "{{ stream_url }}?" + new Date().getTime();
+}
+
+document.querySelectorAll('.default-action').forEach(element => {
+    element.addEventListener('change', function () {
+        changeOption(this.id, this.value);
+    });
+});
+
+document.getElementById('refreshStream').addEventListener('click', refreshStream);
+</script>
+{% endblock %}
